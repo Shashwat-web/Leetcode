@@ -1,22 +1,21 @@
 class Solution:
-    def solve(self, coins, i, Target, n, memo):
-        if Target == 0:
-            return 1
-        if i == n:
-            return 0
+    def change(self, amount: int, coins: List[int]) -> int:
+        n = len(coins)
 
-        if (i, Target) in memo:
-            return memo[(i, Target)]
+        dp = [[0] * (amount + 1) for _ in range(n + 1)]
 
-        take = 0
-        if coins[i] <= Target:
-            take = self.solve(coins, i, Target - coins[i], n, memo)
+        # Base case
+        for i in range(n + 1):
+            dp[i][0] = 1
 
-        not_take = self.solve(coins, i + 1, Target, n, memo)
+        for i in range(n - 1, -1, -1):
+            for T in range(1, amount + 1):
+                take = 0
+                if coins[i] <= T:
+                    take = dp[i][T - coins[i]]
 
-        memo[(i, Target)] = take + not_take
-        return memo[(i, Target)]
+                not_take = dp[i + 1][T]
 
-    def change(self, amount: int, coins: list[int]) -> int:
-        memo = {}
-        return self.solve(coins, 0, amount, len(coins), memo)
+                dp[i][T] = take + not_take
+
+        return dp[0][amount]
